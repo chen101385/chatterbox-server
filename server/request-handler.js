@@ -12,43 +12,60 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
+let dataStore = {
+  results: [{username: 'Jono', message: 'I like chicken butts'}, {username: 'animal', message: 'I feel dumb right now'}]
+};
+
 exports.requestHandler = function(request, response) {
 
-  let messages = [{username: 'blarg', message: 'I like chicken butts'}, {username: 'animal', message: 'I feel dumb right now'}];
+  var defaultCorsHeaders = {
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'access-control-allow-headers': 'content-type, accept',
+    'access-control-max-age': 10 // Seconds.
+  };
+  var headers = defaultCorsHeaders;
 
-  if (request.method === 'GET') {
-    console.log(response);
-    response.writeHead(200, {
-      'Content-Type': 'application/json'
-    });
-    response.end(JSON.stringify(messages));
+  if (!request.url.startsWith('/classes/messages')) {
+    response.writeHead(404, headers);
+    response.end();
   }
 
-//add an error listener (i.e. 404)
+  if (request.method === 'GET') {
+    if (request.url.startsWith('/classes/messages')) {
+      response.writeHead(200, headers);
+      response.end(JSON.stringify(dataStore));
+    }
+  }
+  // For POST
+  if (request.method === 'POST') {
+    // Check if url start is valid
+    if (request.url.startsWith('/classes/messages')) {
+      console.log(request);
+      var incomingString = '';
+      // read data from request object
+      request.on('error', (err) => {
+        console.error(err);
+      }).on('data', (chunk) => {
+        incomingString = chunk.toString('utf8');
+        console.log('Incoming String:', incomingString);
+        // dataStore.results.push(chunk.toString('utf8'));
+      }).on('end', () => {
+        dataStore.results.unshift(JSON.parse(incomingString));
+        console.log('this chain ended');
+        console.log(dataStore.results);
+      });
+      response.writeHead(201, headers);
+      response.end(JSON.stringify(dataStore));
+      // maybe clean it, push to dataStore.results
+      // Deal with response
+        // writing head of response
+        // ending the response, pass in dataStore?
+    }
+  }
+  
 
 
-//POST request (send data to server)
-//data event
-  //chunk emitted @ data event = buffer;  
-    //if string data, then store in an array?
-//end event
-  //return data?
-//
-  // const {headers, method, url} = request;
-  // const {headers} = request
-    //method = HTTP method/verb (ie GET/POST)
-    //url = full URL without server, protocol or port.
-    //
-//response.setHeader('[header name]', '[header value]'')
-
-//response.statusCode = 404 (tell client resource wasn't found)
-
-//response.writeHead([NUMBER], {
-// '[header NAME]': 'TITLE',
-// '[header NAME2]': 'TITLE2'
-//})
-
-//response.write
 
   // Request and Response come from node's http module.
   //
