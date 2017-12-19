@@ -12,7 +12,44 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
-var requestHandler = function(request, response) {
+exports.requestHandler = function(request, response) {
+
+  let messages = [{username: 'blarg', message: 'I like chicken butts'}, {username: 'animal', message: 'I feel dumb right now'}];
+
+  if (request.method === 'GET') {
+    console.log(response);
+    response.writeHead(200, {
+      'Content-Type': 'application/json'
+    });
+    response.end(JSON.stringify(messages));
+  }
+
+//add an error listener (i.e. 404)
+
+
+//POST request (send data to server)
+//data event
+  //chunk emitted @ data event = buffer;  
+    //if string data, then store in an array?
+//end event
+  //return data?
+//
+  // const {headers, method, url} = request;
+  // const {headers} = request
+    //method = HTTP method/verb (ie GET/POST)
+    //url = full URL without server, protocol or port.
+    //
+//response.setHeader('[header name]', '[header value]'')
+
+//response.statusCode = 404 (tell client resource wasn't found)
+
+//response.writeHead([NUMBER], {
+// '[header NAME]': 'TITLE',
+// '[header NAME2]': 'TITLE2'
+//})
+
+//response.write
+
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -33,6 +70,12 @@ var requestHandler = function(request, response) {
   var statusCode = 200;
 
   // See the note below about CORS headers.
+  var defaultCorsHeaders = {
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'access-control-allow-headers': 'content-type, accept',
+    'access-control-max-age': 10 // Seconds.
+  };
   var headers = defaultCorsHeaders;
 
   // Tell the client we are sending them plain text.
@@ -55,6 +98,7 @@ var requestHandler = function(request, response) {
   response.end('Hello, World!');
 };
 
+
 // These headers will allow Cross-Origin Resource Sharing (CORS).
 // This code allows this server to talk to websites that
 // are on different domains, for instance, your chat client.
@@ -64,10 +108,4 @@ var requestHandler = function(request, response) {
 //
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
-var defaultCorsHeaders = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
-  'access-control-max-age': 10 // Seconds.
-};
 
