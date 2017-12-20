@@ -25,12 +25,12 @@ exports.requestHandler = function(request, response) {
     'access-control-max-age': 10 // Seconds.
   };
   var headers = defaultCorsHeaders;
-
+  // Bad URL, stop condition
   if (!request.url.startsWith('/classes/messages')) {
     response.writeHead(404, headers);
     response.end();
   }
-
+  // for GET Request
   if (request.method === 'GET') {
     if (request.url.startsWith('/classes/messages')) {
       response.writeHead(200, headers);
@@ -39,7 +39,7 @@ exports.requestHandler = function(request, response) {
   }
   // For POST
   if (request.method === 'POST') {
-    // Check if url start is valid
+    // Check if url path is valid
     if (request.url.startsWith('/classes/messages')) {
       console.log(request);
       var incomingString = '';
@@ -47,20 +47,17 @@ exports.requestHandler = function(request, response) {
       request.on('error', (err) => {
         console.error(err);
       }).on('data', (chunk) => {
+        // listen for incoming string, transcode key-codes into utf8 string 
         incomingString = chunk.toString('utf8');
         console.log('Incoming String:', incomingString);
-        // dataStore.results.push(chunk.toString('utf8'));
       }).on('end', () => {
         dataStore.results.unshift(JSON.parse(incomingString));
         console.log('this chain ended');
-        console.log(dataStore.results);
       });
+      // set response head
       response.writeHead(201, headers);
+      // send datastore back in response body
       response.end(JSON.stringify(dataStore));
-      // maybe clean it, push to dataStore.results
-      // Deal with response
-        // writing head of response
-        // ending the response, pass in dataStore?
     }
   }
   
